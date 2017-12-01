@@ -1,0 +1,44 @@
+\section{Introduction}
+
+\begin{enumerate}
+    \item Introduction
+    \begin{enumerate}
+        \item DNN workloads are valuable
+        \item Acceleration of DNNs is valuable
+        \item There are many ways of accelerating DNNs, software and hardware
+        \item Picking the right accelerator with the right hardware resources is dependent on the kernel
+        \item There are many different approaches to neural network-based solutions. (i) Some, such as HTM, are more biologically accurate, some are (ii) synthetic but still biologically inspired. As part of these approaches, there are many algorithms (kernels) in DNN, which are suited to different types of data, the most important kernels are CNN, LSTM, and MLP
+        \item The metrics of interest in accelerating these workloads are average turnaround time, i.e., latency, or number of inferences per second, i.e., throughput. System-level metrics include efficiency and utilization. These are the metrics by which we can compare between two accelerator implementations. 
+        \item There are many different accelerator options, with different parallel resources. Spatial architectures offer opportunities to parallelize DNN workloads because of their available ILP and TLP resources
+    \end{enumerate}
+    \item HTM on the AP
+    \begin{enumerate}
+        \item HTM is valuable because it is an attempt to distill the principles of the neocortex into software.
+    \end{enumerate}
+    \item Dissertation chapters
+    \begin{enumerate}
+        \item Mapping HTM to the AP
+        \item Automatic synthesis of HTM models on the AP
+        \item Mapping DNNs to systolic arrays
+        \item Optimization of DNN workloads on systolic arrays
+        \item 
+    \end{enumerate}
+\end{enumerate}
+
+Brain-inspired and ``cognitive'' algorithms have become a mainstay in the domains of classification, anomaly detection, and prediction because they are trainable and generalizable.
+There is a wide variety of approaches, with varying degrees of success in a variety of domains.
+For example, Hierarchical Temporal Memory is very biologically accurate, and has been shown to perform well for prediction and anomaly detection for single-dimensional signals.
+Convolutional neural networks are considered state-of-the-art in image recognition tasks.
+The success of biologically inspired algorithms motivates their acceleration and scalability.
+
+Broadly, these algorithms are composed of computational units called neurons, which are collected into a cascade of layers.
+Neurons accept a set of inputs that are combined with the weight parameters to produce an output which is passed on to the next layer of neurons.
+The output of the last layer provides a classification or detection confidence signal that is passed on to other entities within the software framework.
+
+
+Due to the multiple dimensions of parallelism present in these algorithms, neural networks do not perform well on traditional CPUs, and the even the best of these implementations make heavy use of SIMD instructions to exploit data reuse.
+This is due to two factors: (i) the large amount of parallelism available in a single dimension, e.g., although the MLP kernel only has a single dimension of parallelism, that dimension is very wide, requiring many parallel resources that can exhaust even SIMD resources on a CPU.
+GPUs do have very wide SIMD capabilities, and implement MLPs well, but they cannot efficiently exploit all the dimensions of parallelism of highly parallel kernels such as convolutional.
+Furthermore, they require large batching and while they improve throughput, their impact on latency is not as pronounced.
+Furthermore, as DNN graphs have gotten larger and deeper, the available parallelism but also memory requirements have grown, leading CPU platforms to become exhausted due to limits in cache size.
+
