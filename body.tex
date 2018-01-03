@@ -1,44 +1,177 @@
+% \section{Outline}
+
+% \begin{enumerate}
+%     \item Introduction
+%     \begin{enumerate}
+%         \item DNN workloads are valuable
+%         \item Acceleration of DNNs is valuable
+%         \item There are many ways of accelerating DNNs, software and hardware
+%         \item Picking the right accelerator with the right hardware resources is dependent on the kernel
+%         \item There are many different approaches to neural network-based solutions. (i) Some, such as HTM, are more biologically accurate, some are (ii) synthetic but still biologically inspired. As part of these approaches, there are many algorithms (kernels) in DNN, which are suited to different types of data, the most important kernels are CNN, LSTM, and MLP
+%         \item The metrics of interest in accelerating these workloads are average turnaround time, i.e., latency, or number of inferences per second, i.e., throughput. System-level metrics include efficiency and utilization. These are the metrics by which we can compare between two accelerator implementations. 
+%         \item There are many different accelerator options, with different parallel resources. Spatial architectures offer opportunities to parallelize DNN workloads because of their available ILP and TLP resources
+%     \end{enumerate}
+%     \item HTM on the AP
+%     \begin{enumerate}
+%         \item HTM is valuable because it is an attempt to distill the principles of the neocortex into software.
+%     \end{enumerate}
+%     \item Dissertation chapters
+%     \begin{enumerate}
+%         \item Mapping HTM to the AP
+%         \item Automatic synthesis of HTM models on the AP
+%         \item Mapping DNNs to systolic arrays
+%         \item Optimization of DNN workloads on systolic arrays
+%         \item 
+%     \end{enumerate}
+% \end{enumerate}
+
+% \pagebreak
 \section{Introduction}
 
-\begin{enumerate}
-    \item Introduction
-    \begin{enumerate}
-        \item DNN workloads are valuable
-        \item Acceleration of DNNs is valuable
-        \item There are many ways of accelerating DNNs, software and hardware
-        \item Picking the right accelerator with the right hardware resources is dependent on the kernel
-        \item There are many different approaches to neural network-based solutions. (i) Some, such as HTM, are more biologically accurate, some are (ii) synthetic but still biologically inspired. As part of these approaches, there are many algorithms (kernels) in DNN, which are suited to different types of data, the most important kernels are CNN, LSTM, and MLP
-        \item The metrics of interest in accelerating these workloads are average turnaround time, i.e., latency, or number of inferences per second, i.e., throughput. System-level metrics include efficiency and utilization. These are the metrics by which we can compare between two accelerator implementations. 
-        \item There are many different accelerator options, with different parallel resources. Spatial architectures offer opportunities to parallelize DNN workloads because of their available ILP and TLP resources
-    \end{enumerate}
-    \item HTM on the AP
-    \begin{enumerate}
-        \item HTM is valuable because it is an attempt to distill the principles of the neocortex into software.
-    \end{enumerate}
-    \item Dissertation chapters
-    \begin{enumerate}
-        \item Mapping HTM to the AP
-        \item Automatic synthesis of HTM models on the AP
-        \item Mapping DNNs to systolic arrays
-        \item Optimization of DNN workloads on systolic arrays
-        \item 
-    \end{enumerate}
-\end{enumerate}
+Brain-inspired and ``cognitive''-style algorithms have become a critical part of computer software applications in the domains of classification, regression, anomaly detection, and prediction.
+Rather than being explicitly programmed through static instructions, these algorithms are more brain-like than classical approaches, such as statistical methods, because they mimic the brain's capabilities for autonomous pattern learning and generalization by automatically building internal representations from exposure to data.
+If we consider of the brain as the energy efficient ``hardware'' of mammalian intelligence~\cite{laughlin2003communication}, it is interesting to study the kinds of properties that the best hardware of \textit{silicon} intelligence might inherit from the brain, towards achieving comparable functionality and efficiency.
 
-Brain-inspired and ``cognitive'' algorithms have become a mainstay in the domains of classification, anomaly detection, and prediction because they are trainable and generalizable.
-There is a wide variety of approaches, with varying degrees of success in a variety of domains.
-For example, Hierarchical Temporal Memory is very biologically accurate, and has been shown to perform well for prediction and anomaly detection for single-dimensional signals.
-Convolutional neural networks are considered state-of-the-art in image recognition tasks.
-The success of biologically inspired algorithms motivates their acceleration and scalability.
+Artificial neural networks (ANNs)~\cite{mcculloch1943logical, hebb2005organization, farley1954simulation, rochester1956tests} are a broad class of machine learning algorithms that are inspired by both the structure and the functionality of biological neural networks, and are the basis of the majority of modern machine learning software applications.
+\textit{Structurally}, ANNs are modeled as interconnected computational units called neurons, which are collected into a cascade of layers.
+Neurons accept a vector of inputs that are combined with internal weight parameters to produce an output, which is passed on to the next layer of neurons, and so on, the result of which is communicated to higher levels within a software framework.
+\textit{Functionally}, they can be trained to provide classification, detection, or prediction functions for various data types, while automatically generalizing from past experience.
 
-Broadly, these algorithms are composed of computational units called neurons, which are collected into a cascade of layers.
-Neurons accept a set of inputs that are combined with the weight parameters to produce an output which is passed on to the next layer of neurons.
-The output of the last layer provides a classification or detection confidence signal that is passed on to other entities within the software framework.
+% Functionally, artificial neurons are typically used in two phases: during \textit{training}, the functionality of the network is iteratively improved through exposure to input data as the internal weights are updated to match known good outputs.
+% Then during \textit{inference}, the network is presented with a new set of inputs, the input data values are combined with the trained neuron weights in each layer in sequence until a vector of outputs is produced at the final layer.
+Neural networks are especially adept at autonomously extracting features and interpreting \textit{structural} data, such as images or other multidimensional signals.
+Examples of ANNs that operate on structural data are multilayer perceptrons (MLPs)~\cite{rosenblatt1961principles}, and convolutional neural networks (CNNs)~\cite{karpathy2015cs231n}.
+Furthermore, deep neural networks (DNNs), modeled after the brain's visual and auditory cortices, contain many tens or hundreds of ANN layers~\cite{lee2009convolutional, simonyan2014very, sermanet2013overfeat, szegedy2015going, krizhevsky2012imagenet}, and have been used extensively and successfully for many applications focused on this type of data.
+% Image recognition and classification, cancer diagnosis, spam filtering, voice recognition, and controlling self-driving vehicles are just a subset of such applications deployed on platforms ranging from cloud services, to smartphones and autonomous vehicles~\cite{hannun2014deep, he2016deep, hinton2012deep, krizhevsky2012imagenet, li2016persona, silver2016mastering, jafari2016extraction, fridman2017autonomous}.
+
+In contrast, a related class of ANNs, called recurrent neural networks (RNNs), are designed to perform inference on \textit{temporal} signals.
+RNNs contain local storage and cyclical connections that combine elements of past inputs with current inputs to predict future inputs.
+As an example, hierarchical temporal memory (HTM)~\cite{ahmad2015properties, mnatzaganian2017mathematical} is closely modeled after the neocortex, and can learn to predict future outputs and detect anomalies by exposure to a stream of incoming data.
+A more mainstream RNN example is long-short term memory (LSTM), which is the main algorithm behind applications such as natural language processing and machine translation.
+
+\subsection{Problem Definition}
+
+Given that these kinds of algorithms are a critical part of important modern software applications, it is valuable to implement them in computer hardware in a scalable and efficient way.
+Across domains, while an interconnected neuronal structure is similar for several mainstream machine learning computational \textit{kernels}, the workload characteristics of the algorithms can vary greatly, which can have a big impact on performance\cn.
+Spatial architectures have been shown to work well for accelerating such kernels, because they provide several dimensions of parallel compute resources.
+
+Broadly, the challenge to be addressed by this work is to improve the performance of a broad class of machine learning workloads while simultaneously improving their efficiency.
+To improve (i) \textit{performance}, the challenge is to recognize the parallelism exposed by these algorithms at design time, at multiple levels of abstraction, and to efficiently map the algorithm to the available parallel hardware resources, in such a way that communication overhead is minimized.
+To improve (ii) \textit{efficiency}, the challenge is to exploit prior knowledge of the workload characteristics of the algorithms to minimize underutilized hardware resources.
+
+Many works introduce spatial architectures for the acceleration of neural networks and deep neural networks.
+However, these works focus almost exclusively on CNNs.
+RNNs are very valuable for a variety of applications, and it has been reported that they make up a majority of workloads in dataecnters, and accelerating them would also be very valuable.
+However, nobody has yet clearly identified RNN workload parameters, and how these could efficiently be mapped to spatial architectures.
+
+LSTMs have been accelerated on spatial architectures, but a processing dataflow has not been introduced that can process all LSTM operations.
+Acceleration of LSTMs has been demonstrated on specialized hardware, but only using neural network primitives, such as dense and sparse matrix operations, which require significant additional communication overhead to generate output\cn. 
+An efficient dataflow for such networks would allow operations to be done in place, significantly reducing communication overhead, and improving performance and efficiency.
+
+Optimization of neural networks on spatial architectures has primarily been done at the software level, using dataflow optimization, leaving performance and efficiency margins unclaimed due to inefficient mapping to static architectures.
+What is needed is a methodology that exploits the diversity in the computational characteristics of DNN layers to improve the energy efficiency of spatial architecture accelerators by dynamically configuring accelerator microarchitectural parameters.
+
+% However, an important distinction is that the dimensions of data structures and order of operations as part of these algorithms are known at design time, which can be exploited to build efficient accelerator hardware.
+
+% A high degree of data parallelism is a common characteristic among these kernels, which can be exploited to improve performance using computer architectures with many parallel resources.
+% Because of the parallel nature of these algorithms, people have been successful with mapping these algorithms to highly parallel computer architectures.
+
+% There are several key challenges within the context of accelerating neural network workloads in computer architectures.
+% Doing this in an efficient way requires (i) recognizing similarities across DNN workloads that can be exploited to minimize logic overhead and (ii) recognizing inter-kernel differences and (iii) being able to adapt to intra-kernel differences, i.e., the dynamic characteristics across program phases. 
+
+There are many different ways to do this, the most popular being optimizing the dataflow, i.e., the mapping of the algorithm onto available hardware.
+While this is an important step in the optimization process, even the best dataflow leaves performance margins and underutilizes hardware\cn.
+
+Although the most common operations in DNNs have benefited from exploitation of SIMD and SIMT processing, there remain challenges to simultaneously meeting both performance and efficiency goals for these platforms.
+On CPU, dataflow optimizations and SIMD ISA extentions can be used to capture speedups over SISD, but this is  limited by the relatively small number of available compute units, and dynamic memory requirements that stress the cache hierarchy~\cite{vanhoucke2011improving}.
+GPUs provide very wide SIMD capabilities, and can provide deeper loop unrolling and more opportunity for hiding the latency of memory for large blocks of input data.
+However, thread divergence can cause significant reduction in utilization, especially in networks with many layers with heterogeneous workload characteristics, such as DNNs~\cite{hill2017deftnn}.
+Furthermore, they require large batching and while they improve throughput, their impact on latency is limited~\cite{jouppi2017datacenter}.
+Reconfigurable logic architectures for accelerating machine learning have also been proposed in FPGA substrates~\cite{putnam2014reconfigurable, ovtcharov2015accelerating, caulfield2016cloudscale, chung2017accelerating}.
+
+Several customized spatial architectures have been proposed for the acceleration of neural networks~\cite{chen2017eyeriss, han2016eie}.
+These spatial architectures have been shown to be the most promising, because they are able to take advantage of available opportunities for data reuse in DNN kernels to both improve performance and save power.
+While these have shown significant improvements in both performance and efficiency, all have focused on optimizing for fully-connected and convolutional kernels.
+Recent studies showing that recurrent neural networks make up a large portion of datacenter workloads~\cite{jouppi2017datacenter, dhawan2012fathom} motivate the need to investigate recurrent network workloads as well.
+There is a need for a study that identifies the available parallelism in RNNs, highlights opportunities for acceleration, and identifies the right architecture for its acceleration.
+
+% Hierarchical temporal memory is a kind of cortical learning algorithm that can learn to predict future outputs and detect anomalies by exposure to a continuous stream of incoming data.
+% HTM is useful in applications such as robotics, where it could be used to predict future inputs and to automatically detect anomalies and failures~\cite{walter2017spinnaker}, or for predicting future stock prices~\cite{gabrielsson2012hierarchical}, predicting human trafficking~\cite{sinkevicius2011monitoring}, image databases~\cite{zhituo2012content}, and handwritten digit recognition~\cite{bobier2007handwritten}.
+% Although classic neural networks have seen better practical results, biomimetic networks have the potential for better generalizability, which has been considered the ``holy grail'' of artificial general intelligence (AGI).
+
+To recognize the parallelism available in RNNs, we must first study the algorithm and highlight the available parallelism, and then study how that parallelism can be exploited to improve performance and scalability 
+HTM is an RNN that is made to mimic both the structure and the functionality of the neocortex, and has successful in detecting anomalies and failures in robotics applications~\cite{walter2017spinnaker}, for predicting future stock prices~\cite{gabrielsson2012hierarchical}, predicting human trafficking~\cite{sinkevicius2011monitoring}, image databases~\cite{zhituo2012content}, and handwritten digit recognition~\cite{bobier2007handwritten}.
+Existing HTM implementations on von Neumann architecture have focused mainly on achieving functionality rather than performance or scalability. 
+Furthermore, previous efforts to accelerate HTM have only implemented a very small model, which is incompatible with real-world sized datasets.
+The Automata Processor~\cite{dlugosch2014efficient} is a kind of spatial architecture that implements counter-enhanced nondeterministic finite automata in silicon.
+Accelerating Hierarchical Temporal Memory on the Automata Processor makes for an interesting case study to show potential performance and scalability gains, due to the numerous correspondences between the execution model of HTM cells and processing elements of the AP.
+
+Second, although a number of customized hardware solutions have been developed for acceleration of classical neural networks, these have been highly specialized to a narrow set of kernels.
+Although a number of customized hardware solutions have been proposed, based on spatial architecture, practically all of these have focused on the acceleration of DNNs and associated functions, \textit{i.e.}, convolution, activation, pooling, and classification.
+
+As an additional benefit to dynamic reconfiguration, as machine learning continues to develop, accelerators will need to adapt to the changing workloads, both for optimization of existing kernels, and for efficient runtime optimization of existing and future kernels.
+
+What is needed is a methodology for optimizing existing neural network acceleration hardware for optimizing the hardware configuration based on workload characteristics to maintain efficiency with a broad number of continuously evolving DNN kernels.
+
+\subsection{Statement of Work}
+
+Due to the challenges of mapping neural network tasks to spatial architectures, we propose to first study and contrast HTM performance and scalability on baseline hardware, and on spatial architecture accelerator hardware.
+Investigating acceleration of HTM is valuable as a demonstration for this problem because it highlights performance issues on traditional, von Neumann architectures, and it exposes the correspondences that make efficient HTM performance possible on the Automata Processor.
+Furthermore, it serves to elucidate the kind of architecture better suited for these kinds of workloads.
+We propose the following research tasks as part of the effort to investigate challenges of accelerating neural networks on spatial architectures:
+
+\begin{itemize}
+    \item Design and evaluate a functional model of Hierarchical Temporal Memory on a suitable spatial hardware architecture
+    \item Develop a methdology for synthesis of general HTM models in spatial architectures
+\end{itemize}
+
+Once we have demonstrated the challenges of processing neural network workloads on von Neumann architectures, and shown the advantages of spatial architectures as a viable platform for neural network acceleration, we turn our attention to more conventional neural networks.
+In the following tasks, we will develop research toward optimizing spatial architectures based on the incoming workload toward improving performance and power efficiency.
+
+\begin{itemize}
+    \item Design and implement a tool for optimization of spatial architecture hardware parameters based on the workload characteristics (compute and data) of DNN workloads. 
+    This tool should be general enough to facilitate performance and power modeling of general DNN workloads on any spatial architecture accelerator.
+    \item A methodology for the optimization of neural network accelerators based on its dynamic workload characteristics, and evaluation with several DNN workloads
+    \item A comparison the of deep neural network workloads across several spatial architectures
+    \item A spatial architecture accelerator with flexible parameters that can dynamically adapt to compute and communication characteristics to improve efficiency.
+\end{itemize}
+
+% Brain-inspired algorithms have become a critical part of modern applications
+% The human brain is the source of inspiration for today's newest computational models.
+% Ultimately there can be many benefits to artificial general intelligence 
+
+% Ultimately what we want to do is to try and emulate higher cognitive functions of the human brain, but in a computer, where it can be much more powerful than a single human brain. 
+% This is because it has more access to information
+% A silicon brain could have faster reactions than a human brain.
+% It is connected to a network so it has access to all the world's digitized information
+% It has access to much more information than can be held in biological memory, and can access it much faster.
+% It can also process data faster and more parallel than a biological brain.
+% An artificial brain would be able to construct heuristics much faster 
+% Hierarchical Temporal Memory is a type of neural network with very high fidelity to the human brain.
 
 
-Due to the multiple dimensions of parallelism present in these algorithms, neural networks do not perform well on traditional CPUs, and the even the best of these implementations make heavy use of SIMD instructions to exploit data reuse.
-This is due to two factors: (i) the large amount of parallelism available in a single dimension, e.g., although the MLP kernel only has a single dimension of parallelism, that dimension is very wide, requiring many parallel resources that can exhaust even SIMD resources on a CPU.
-GPUs do have very wide SIMD capabilities, and implement MLPs well, but they cannot efficiently exploit all the dimensions of parallelism of highly parallel kernels such as convolutional.
-Furthermore, they require large batching and while they improve throughput, their impact on latency is not as pronounced.
-Furthermore, as DNN graphs have gotten larger and deeper, the available parallelism but also memory requirements have grown, leading CPU platforms to become exhausted due to limits in cache size.
+\section{Related Work}
+\section{Research Plan and Progress}
+\section{Summary and Plan of Work}
 
+My past research efforts have completed the following work:
+
+\begin{itemize}
+    \item Evaluation of hierarchical temporal memory performance and scalability in von Neumann architecture, design and implementation of hierarchical temporal memory in the Automata processor, and evaluation of speedup and scalability in comparison.
+    \item Development of a methodology for synthesis, simulation, and validation of hierarchical temporal memory models in the automata processor
+    \item 
+\end{itemize}
+
+The following tasks have yet to be completed:
+
+\begin{itemize}
+    \item Document and open-source Krycek toolchain for evaluation of DNN workloads on spatial architectures
+\end{itemize}
+
+The expected main chapters of my dissertation are:
+
+\begin{itemize}
+    \item Mapping hierarchical temporal memory on the Automata processor
+    \item Synthesis, simulation, and validation of hierarchical temporal memory in the Automata processor
+    \item Optimization of deep neural networks on spatial processor architectures
+\end{itemize}
