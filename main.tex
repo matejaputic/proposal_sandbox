@@ -1,17 +1,45 @@
 \documentclass{article}
 \usepackage[utf8]{inputenc}
 
-\title{Dissertation Proposal}
+\title{Optimization of Spatial Architectures for\\Acceleration of Machine Learning}
 \author{Mateja Putic}
 \date{Spring 2018}
 
 \usepackage{palatino}
 \usepackage{natbib}
 \usepackage{graphicx}
-% \usepackage[letterpaper, margin=1in]{geometry}
+\usepackage{booktabs} % For formal tables
+\usepackage[letterpaper, margin=1in]{geometry}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{xspace}
+\usepackage{xfrac}
 
-\newcommand\cn{\textsuperscript{[\textit{citation needed}]}}
-\newcommand\paragraphHeading[1]{\textbf{#1:}}
+\newcommand\paragraphHeading[1]{\textbf{#1:}\xspace}
+\newcommand\eg{\emph{e.g.}\xspace}
+\newcommand\ie{\emph{i.e.}\xspace}
+\newcommand\etc{\emph{etc.}\xspace}
+\newcommand\viz{\emph{viz.}\xspace}
+\newcommand{\oneSub}[2]{$\textrm{#1}_{#2}$}
+\newcommand{\twoSub}[3]{$\textrm{#1}_{#2,#3}$}
+\newcommand\dyhardDnn{DyHard-DNN\xspace}
+\newcommand\dyhardDnns{{\dyhardDnn}s\xspace}
+\newcommand\dyhardXplore{DyHard-Xplore\xspace}
+\newcommand\bpc{\ensuremath{~\sfrac{\textrm{Bytes}}{\textrm{Cycle}}}}
+
+\newcommand\Nin{\ensuremath{N_\textrm{in}}}
+\newcommand\Nout{\ensuremath{N_\textrm{out}}}
+\newcommand\Nij{\ensuremath{N_{ij}}}
+\newcommand\Ni{\ensuremath{N_i}}
+\newcommand\Nj{\ensuremath{N_j}}
+\newcommand\Nki{\ensuremath{K_{i}}}
+\newcommand\Nkj{\ensuremath{K_{j}}}
+\newcommand\Kij{\ensuremath{K_{ij}}}
+\newcommand\Nkij{\ensuremath{K_{ij}}}
+
+\newcommand\googlenet{GoogLeNet\xspace}
+% Set line spacing
+% \renewcommand{\baselinestretch}{1.15}
 
 \begin{document}
 
